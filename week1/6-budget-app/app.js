@@ -22,12 +22,14 @@ const budgetController = (function () {
         return this.percentage;
     };
 
+
     //income class
     const Income = function (id, description, value) {
         this.id = id;
         this.description = description;
         this.value = value;
     };
+
 
     //data structure
     const data = {
@@ -43,6 +45,7 @@ const budgetController = (function () {
         percentage: -1
     };
 
+
     //private methods
     const calculateTotal = function (type) {
         let sum = 0;
@@ -53,6 +56,7 @@ const budgetController = (function () {
 
         data.totals[type] = sum;
     };
+
 
     //public methods
     return {
@@ -150,8 +154,28 @@ const UIController = (function () {
         expensesLabel: '.budget__expenses--value',
         percentageLabel: '.budget__expenses--percentage',
         container: '.container',
-        expensesPercentageLabels: '.item__percentage'
-    }
+        expensesPercentageLabels: '.item__percentage',
+        dateLabel: '.budget__title--month'
+    };
+
+    //private methods
+    const formatNumber = function (num, type) {
+        const sign = type === 'exp' ? '-' : '+';
+
+        num = Math.abs(num);
+        num = num.toFixed(2);
+
+        const numSplit = num.split('.');
+
+        let int = numSplit[0];
+        if (int.length > 3) {
+            int = int.substr(0, int.length - 3) + ',' + int.substr(int.length - 3, 3);
+        }
+
+        const decimal = numSplit[1];
+
+        return sign + ' ' + int + '.' + decimal;
+    };
 
 
     //public methods
@@ -169,13 +193,13 @@ const UIController = (function () {
         addListItem: function (obj, type) {
             //Create html string with placeholder text
             const id = type === 'exp' ? 'exp-' + obj.id : 'inc-' + obj.id;
-            const valuePrefix = type === 'exp' ? '-' : '+';
+            const value = formatNumber(obj.value, type);
             const percentageDiv = type === 'exp' ? '<div class="item__percentage"></div>' : '';
 
             const html = `<div class="item clearfix" id="${id}">
                             <div class="item__description">${obj.description}</div>
                             <div class="right clearfix">
-                                <div class="item__value">${valuePrefix} ${obj.value}</div>
+                                <div class="item__value">${value}</div>
                                 ${percentageDiv}
                                 <div class="item__delete">
                                     <button class="item__delete--btn">
@@ -210,11 +234,13 @@ const UIController = (function () {
 
 
         displayBudget: function (obj) {
-            const percentageSufix = obj.percentage >= 0 ? obj.percentage + "%" : '---';
 
-            document.querySelector(DOMstrings.budgetLabel).textContent = obj.budget;
-            document.querySelector(DOMstrings.incomeLabel).textContent = obj.totalIncome;
-            document.querySelector(DOMstrings.expensesLabel).textContent = obj.totalExpenses;
+            const type = obj.budget >= 0 ? 'inc' : 'exp';
+            document.querySelector(DOMstrings.budgetLabel).textContent = formatNumber(obj.budget, type);
+            document.querySelector(DOMstrings.incomeLabel).textContent = formatNumber(obj.totalIncome, 'inc');
+            document.querySelector(DOMstrings.expensesLabel).textContent = formatNumber(obj.totalExpenses, 'exp');
+
+            const percentageSufix = obj.percentage >= 0 ? obj.percentage + "%" : '---';
             document.querySelector(DOMstrings.percentageLabel).textContent = percentageSufix;
         },
 
@@ -223,6 +249,28 @@ const UIController = (function () {
             const fields = document.querySelectorAll(DOMstrings.expensesPercentageLabels);
 
             fields.forEach((field, i) => percentages[i] > 0 ? field.textContent = percentages[i] + '%' : field.textContent = '---');
+        },
+
+
+        displayMonth: function () {
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth();
+
+            document.querySelector(DOMstrings.dateLabel).textContent = months[month] + ' ' + year;
+        },
+
+
+        inputTypeChanged: function () {
+            const fields = document.querySelectorAll(`${DOMstrings.inputType}, ${DOMstrings.inputDescription}, ${DOMstrings.inputAddValue}`);
+
+            fields.forEach(field => {
+                field.classList.toggle('red-focus');
+            });
+
+            document.querySelector(DOMstrings.inputBtn).classList.toggle('red');
         },
 
 
@@ -254,7 +302,11 @@ const appController = (function (budgetCtrl, UICtrl) {
 
         //income and expenses items container click event handler on delete
         document.querySelector(DOM.container).addEventListener('click', deleteItem);
+
+        //listen to change values on input type select tag
+        document.querySelector(DOM.inputType).addEventListener('change', UIController.inputTypeChanged);
     }
+
 
     const updateBudget = function () {
         //calculate the budget
@@ -266,6 +318,7 @@ const appController = (function (budgetCtrl, UICtrl) {
         //update budget on the UI
         UICtrl.displayBudget(budget);
     }
+
 
     const updatePercentages = function () {
         //calculate percentages
@@ -305,6 +358,7 @@ const appController = (function (budgetCtrl, UICtrl) {
         }
     };
 
+
     const deleteItem = function (e) {
         const itemId = e.target.parentNode.parentNode.parentNode.parentNode.id;
 
@@ -327,11 +381,13 @@ const appController = (function (budgetCtrl, UICtrl) {
         }
     }
 
+
     //public methods
     return {
 
         init: function () {
             UICtrl.displayBudget({ budget: 0, totalIncome: 0, totalExpenses: 0, percentage: 0 });
+            UIController.displayMonth();
             setupEventListeners();
         }
     }
