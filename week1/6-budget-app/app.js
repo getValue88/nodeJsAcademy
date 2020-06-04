@@ -1,4 +1,4 @@
-// data module
+// DATA MODULE
 const budgetController = (function () {
 
     // expense class
@@ -138,7 +138,7 @@ const budgetController = (function () {
 })();
 
 
-//ui module
+//UI MODULE
 const UIController = (function () {
 
     //dom classes objetc
@@ -281,7 +281,7 @@ const UIController = (function () {
 })();
 
 
-//app module
+//APP MODULE
 const appController = (function (budgetCtrl, UICtrl) {
 
     //private methods
@@ -395,4 +395,5 @@ const appController = (function (budgetCtrl, UICtrl) {
 })(budgetController, UIController);
 
 
+//APP INITIALIZE
 appController.init();
