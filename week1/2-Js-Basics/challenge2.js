@@ -2,6 +2,9 @@
 console.log('\nCODING CHALLENGE 2');
 
 
+function calcTeamAvgScore(score1, score2, score3) {
+    return (score1 + score2 + score3) / 3;
+}
 
 const johnTeamAverage = calcTeamAvgScore(89, 120, 103),
     mikeTeamAverage = calcTeamAvgScore(116, 94, 123),
@@ -21,7 +24,3 @@ switch (true) {
         console.log('Draw! Two or more teams have the same average score.');
 }
 
-
-function calcTeamAvgScore(score1, score2, score3) {
-    return (score1 + score2 + score3) / 3;
-}

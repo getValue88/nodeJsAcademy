@@ -42,7 +42,6 @@ document.querySelector('.btn-hold').addEventListener('click', function () {
     
         //check if there is a winner
         if (scores[activePlayer] >= 100) {
-
             // update ui
             document.getElementById('name-' + activePlayer).textContent = 'Winner';
             document.querySelector('.player-' + activePlayer + '-panel').classList.add('winner');

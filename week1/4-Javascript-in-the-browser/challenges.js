@@ -16,7 +16,6 @@ startGame();
 //roll button
 document.querySelector('.btn-roll').addEventListener('click', function () {
     if (activeGame) {
-
         // random values between 1 and 6
         const diceOne = Math.round(Math.random() * 5) + 1;
         const diceTwo = Math.round(Math.random() * 5) + 1;
