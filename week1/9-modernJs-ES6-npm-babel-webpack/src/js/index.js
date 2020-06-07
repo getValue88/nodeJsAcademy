@@ -2,9 +2,13 @@
 // forkify-api.herokuapp.com --> api documentation
 import Search from './models/Search';
 import Recipe from './models/Recipe';
+import List from './models/List';
+import Likes from './models/Likes';
 import { elements, renderLoader, clearLoader } from './views/base';
 import * as searchView from './views/searchView';
 import * as recipeView from './views/recipeView';
+import * as listView from './views/listView';
+import * as likesView from './views/likesView';
 
 //GLOBAL STATE
 //SEARCH OBJECT
@@ -12,6 +16,8 @@ import * as recipeView from './views/recipeView';
 //SHOPPING LIST OBJECT
 //LIKED RECIPES
 const state = {};
+
+
 
 /*
 *   SEARCH CONTROLLER
@@ -92,7 +98,7 @@ const controlRecipe = async () => {
 
             //render recipe
             clearLoader();
-            recipeView.renderRecipe(state.recipe);
+            recipeView.renderRecipe(state.recipe, state.likes.isLiked(id));
 
         } catch (error) {
             alert('Error processing recipe!');
@@ -105,7 +111,89 @@ const controlRecipe = async () => {
 ['hashchange', 'load'].forEach(e => window.addEventListener(e, controlRecipe));
 
 
-// increment and decrement serving buttons in recipe click event handler
+
+/*
+*   LIST CONTROLLER
+*/
+
+const controlList = () => {
+    //create a new list if there is none yet
+    if (!state.list) state.list = new List();
+
+    //add each ingredient to the list and ui
+    state.recipe.ingredients.forEach(ing => {
+        const item = state.list.addItem(ing.count, ing.unit, ing.ingredient);
+        listView.renderItem(item);
+    });
+}
+
+// handle delete and update list item events
+elements.shopping.addEventListener('click', e => {
+    const id = e.target.closest('.shopping__item').dataset.itemid;
+
+
+    //handle delete button
+    if (e.target.matches('.shopping__delete, .shopping__delete *')) {
+        //delete from state
+        state.list.deleteItem(id);
+
+        //delete from ui
+        listView.deleteItem(id);
+
+    } else if (e.target.matches('.shopping__count-value')) {
+        const value = parseInt(e.target.value);
+        state.list.updateCount(id, value);
+    }
+});
+
+
+
+/*
+*   LIKES CONTROLLER
+*/
+state.likes = new Likes(); //<-- TESTING
+// likesView.toggleLikeMenu(state.likes.getNumLikes());//<-- TESTING
+
+
+const controlLike = () => {
+    if (!state.likes) state.likes = new Likes();
+    const currentId = state.recipe.id;
+
+    //user has not yet liked current recipe
+    if (!state.likes.isLiked(currentId)) {
+        //add like to state
+        const newLike = state.likes.addLike(
+            currentId,
+            state.recipe.title,
+            state.recipe.author,
+            state.recipe.img
+        );
+
+        //toggle like btn
+        likesView.toggleLikeBtn(true);
+
+        //add like to ui
+        likesView.renderLike(newLike);
+
+
+        //user has liked current recipe
+    } else {
+        //remove like from state
+        state.likes.deleteLike(currentId);
+
+        //toggle like btn
+        likesView.toggleLikeBtn(false);
+
+        //remove like from ui
+        likesView.deleteLike(currentId);
+
+    }
+    likesView.toggleLikeMenu(state.likes.getNumLikes());
+}
+
+
+
+// recipe buttons event handling
 elements.recipe.addEventListener('click', e => {
     if (e.target.matches('.btn-decrease, .btn-decrease *')) {
         //decrase btn
@@ -118,7 +206,13 @@ elements.recipe.addEventListener('click', e => {
         //increase btn
         state.recipe.updateServings('inc');
         recipeView.updateServingsIngredients(state.recipe);
-    }
 
-    console.log(state.recipe);
+    } else if (e.target.matches('.recipe__btn--add, .recipe__btn--add *')) {
+        //add to shopping btn
+        controlList();
+
+    } else if (e.target.matches('.recipe__love, .recipe__love *')) {
+        //like btn
+        controlLike();
+    }
 });

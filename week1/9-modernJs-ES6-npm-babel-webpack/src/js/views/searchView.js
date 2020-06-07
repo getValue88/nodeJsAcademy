@@ -18,7 +18,7 @@ export const highlightSelected = id => {
 }
 
 //format recipe title
-const limitRecipeTitle = (title, limit = 17) => {
+export const limitRecipeTitle = (title, limit = 17) => {
     const newTitle = [];
 
     if (title.length > limit) {
