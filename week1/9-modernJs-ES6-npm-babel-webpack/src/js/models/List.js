@@ -24,6 +24,6 @@ export default class List {
 
     updateCount(id, newCount) {
         const foundItem = this.items.find(item => item.id === id);
-        if(foundItem) foundItem.count = newCount;   
+        if (foundItem) foundItem.count = newCount;
     }
 }

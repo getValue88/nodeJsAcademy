@@ -39,6 +39,17 @@ export const limitRecipeTitle = (title, limit = 17) => {
 };
 
 
+export const renderResults = (recipes, page = 1, resPerPage = 10) => {
+    //render results of current page
+    const start = (page - 1) * resPerPage;
+    const end = page * resPerPage;
+    recipes.slice(start, end).forEach(renderRecipe);
+
+    //render pagination buttons
+    renderButtons(page, recipes.length, resPerPage);
+};
+
+
 const renderRecipe = recipe => {
     const markup = `
         <li>
@@ -90,14 +101,4 @@ const renderButtons = (page, numResults, resPerPage) => {
     }
 
     elements.searchResPages.insertAdjacentHTML('afterbegin', button);
-};
-
-export const renderResults = (recipes, page = 1, resPerPage = 10) => {
-    //render results of current page
-    const start = (page - 1) * resPerPage;
-    const end = page * resPerPage;
-    recipes.slice(start, end).forEach(renderRecipe);
-
-    //render pagination buttons
-    renderButtons(page, recipes.length, resPerPage);
 };
