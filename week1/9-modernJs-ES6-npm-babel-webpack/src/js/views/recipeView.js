@@ -16,7 +16,8 @@ const createIngredient = ingredient => `
 
 const formatCount = count => {
     if (count) {
-        const [int, dec] = count.toString().split('.').map(n => parseInt(n, 10));
+        const newCount = Math.round(count * 10000) / 10000;
+        const [int, dec] = newCount.toString().split('.').map(n => parseInt(n, 10));
 
         if (!dec) return count;
 
