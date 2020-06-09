@@ -20,8 +20,7 @@ yargs.command({
             type: 'string'
         }
     },
-    handler(argv) {
-        const { title, body } = argv;
+    handler({ title, body }) {
         notes.addNote(title, body);
     }
 });
@@ -38,8 +37,7 @@ yargs.command({
             type: 'string'
         }
     },
-    handler(argv) {
-        const { title } = argv;
+    handler({ title }) {
         notes.removeNote(title);
     }
 });
@@ -66,8 +64,7 @@ yargs.command({
             type: 'string'
         }
     },
-    handler(argv) {
-        const { title } = argv;
+    handler({ title }) {
         notes.readNote(title);
     }
 });
