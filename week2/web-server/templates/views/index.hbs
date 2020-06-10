@@ -13,10 +13,18 @@
     <div class="main-content">
         {{>header}}
         <p>Use this site to get your weather</p>
+
+        <form action="">
+            <input type="text" placeholder="Location">
+            <button>Search</button>
+        </form>
+
+        <p id="msg-one"></p>
+        <p id="msg-two"></p>
     </div>
 
     {{>footer}}
-    {{!-- <script src="/js/app.js"></script> --}}
+    <script src="/js/app.js"></script>
 </body>
 
 </html>
