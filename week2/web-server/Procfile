@@ -1,1 +1,1 @@
-web: node src/app.js
+web: npm install week2/web-server && node week2/web-server/src/app.js
