@@ -14,7 +14,7 @@ const foreCast = (latitude, longitude, callback) => {
             const { current } = body;
             callback(
                 undefined,
-                `${current.weather_descriptions[0]}. It is currently ${current.temperature} degrees. It feels like ${current.feelslike} degrees out. There is a ${current.precip}% chance of rain.`
+                `${current.weather_descriptions[0]}. It is currently ${current.temperature} degrees out. It feels like ${current.feelslike} degrees out. There is a ${current.precip}% chance of rain. The humidity is ${current.humidity}%.`
             );
         }
     });

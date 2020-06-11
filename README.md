@@ -3,6 +3,6 @@
 ## week 2
 
 >### Weather App
-> https://weather-app-nodejs-academy.herokuapp.com/
+> http://weather-app-nodejs-academy.herokuapp.com/
 
 ---
