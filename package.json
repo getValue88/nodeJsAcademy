@@ -1,7 +1,7 @@
 {
     "name": "asd",
     "version": "1.0.0",
-    "description": "",
+    "description": "this package.json is to avoid the nodejs buildpack error when deploying multiple apps to heroku from a single repository",
     "main": "app.js",
     "scripts": {},
     "author": "",
