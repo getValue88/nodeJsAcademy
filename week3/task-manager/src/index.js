@@ -8,6 +8,11 @@ const app = express();
 const port = process.env.PORT || 3000;
 app.use(express.json());
 
+//MIDDLEWARES
+/* app.use((req, res, next) => {
+    res.status(503).send('Server is under maintenance');
+}); */
+
 //ROUTERS
 app.use(userRouter);
 app.use(taskRouter);
