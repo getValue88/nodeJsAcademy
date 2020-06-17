@@ -10,7 +10,7 @@ router.post('/users', async (req, res) => {
     try {
         // await user.save();
         const token = await user.generateAuthToken(); // this method also saves the user
-        res.status(201).send({ user, token });
+        res.status(201).send({ user: user.getPublicProfile(), token });
 
     } catch (error) {
         res.status(400).send(error);
@@ -29,15 +29,33 @@ router.post('/users/login', async (req, res) => {
     }
 });
 
-//Get users
-router.get('/users', auth, async (req, res) => {
+//User Logout
+router.post('/users/logout', auth, async (req, res) => {
     try {
-        const users = await User.find({});
-        res.status(200).send(users);
+        req.user.tokens = req.user.tokens.filter(token => token.token !== req.token);
+        await req.user.save();
+        res.send();
 
     } catch (error) {
         res.status(500).send();
     }
+});
+
+//User logoutAll
+router.post('/users/logoutAll', auth, async (req, res) => {
+    try {
+        req.user.tokens = [];
+        await req.user.save();
+        res.send();
+
+    } catch (error) {
+        res.status(500).send();
+    }
+});
+
+//Get users
+router.get('/users/me', auth, async (req, res) => {
+    res.send(req.user);
 });
 
 //Get user by id
