@@ -46,6 +46,8 @@ const userSchema = new mongoose.Schema({
             required: true
         }
     }]
+}, { //Schema options
+    timestamps: true
 });
 
 //relation to Task collection
