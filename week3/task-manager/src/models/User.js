@@ -47,7 +47,14 @@ const userSchema = new mongoose.Schema({
     }]
 });
 
-//instance method
+//relation to Task collection
+userSchema.virtual('tasks', {
+    ref: 'Task',
+    localField: '_id',
+    foreignField: 'owner'
+});
+
+//instance methods
 userSchema.methods.generateAuthToken = async function () {
     const user = this;
     const token = jwt.sign({ _id: user._id.toString() }, 'theSecret');
@@ -58,7 +65,19 @@ userSchema.methods.generateAuthToken = async function () {
     return token;
 };
 
-//class method
+userSchema.methods.toJSON = function () {
+    const user = this;
+    const userObject = user.toObject();
+
+    delete userObject.password;
+    delete userObject.tokens;
+
+    return userObject;
+}
+
+
+
+//class methods
 userSchema.statics.findByCredentials = async (email, password) => {
     const user = await User.findOne({ email });
 
@@ -74,6 +93,9 @@ userSchema.statics.findByCredentials = async (email, password) => {
 
     return user;
 };
+
+
+
 
 //hash plain text password before saving or updating
 userSchema.pre('save', async function (next) {
