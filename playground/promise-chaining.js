@@ -1,6 +1,6 @@
-require('../task-manager/src/db/mongoose');
-const User = require('../task-manager/src/models/User');
-const Task = require('../task-manager/src/models/Task');
+require('../week3/task-manager/src/db/mongoose');
+const User = require('../week3/task-manager/src/models/User');
+const Task = require('../week3/task-manager/src/models/Task');
 
 /* 
 User.findByIdAndUpdate('5ee8bfe83de486125805226e', { age: 1 }).then(user => {

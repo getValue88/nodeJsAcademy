@@ -104,7 +104,7 @@ router.delete('/users/me', auth, async (req, res) => {
     try {
         await req.user.remove();
         sendCancelationEmail(req.user.email, req.user.name);
-        
+
         res.send(req.user);
 
     } catch (error) {
@@ -145,7 +145,7 @@ router.delete('/users/me/avatar', auth, async (req, res) => {
 });
 
 //get avatar by user id
-router.get('/users/:id/avatar', /* auth ,*/ async (req, res) => {
+router.get('/users/:id/avatar', async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
 
