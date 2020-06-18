@@ -4,19 +4,21 @@ const router = new express.Router();
 const User = require('../models/User');
 const auth = require('../middlewares/auth');
 
+//multer config
 const avatarUpload = multer({
-    dest: 'avatars',
+    // dest: 'avatars', <-- folder to save the files
     limits: {
         fileSize: 1000000
     },
     fileFilter(req, file, cb) {
         if (!file.originalname.match(/\.(jpg|jpeg|png|svg)$/)) {
-           return cb(new Error('Allowed extensions: jpg jpeg png svg'));
+            return cb(new Error('Allowed extensions: jpg jpeg png svg'));
         }
 
         cb(undefined, true);
     }
 });
+
 
 //Create User
 router.post('/users', async (req, res) => {
@@ -105,8 +107,27 @@ router.delete('/users/me', auth, async (req, res) => {
 });
 
 //upload avatar
-router.post('/users/me/avatar', [auth, avatarUpload.single('avatar')], (req, res) => {
+router.post('/users/me/avatar', auth, avatarUpload.single('avatar'), async (req, res) => {
+    req.user.avatar = req.file.buffer;
+
+    await req.user.save();
     res.send();
+
+    //error handling
+}, (error, req, res, next) => {
+    res.status(400).send({ error: error.message });
+});
+
+//delete avatar
+router.delete('/users/me/avatar', auth, async (req, res) => {
+    try {
+        req.user.avatar = undefined;
+        await req.user.save();
+        res.send();
+
+    } catch (error) {
+        res.status(500).send();
+    }
 });
 
 module.exports = router;

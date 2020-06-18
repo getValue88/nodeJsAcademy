@@ -45,7 +45,11 @@ const userSchema = new mongoose.Schema({
             type: String,
             required: true
         }
-    }]
+    }],
+    avatar: {
+        type: Buffer
+    }
+
 }, { //Schema options
     timestamps: true
 });
@@ -57,7 +61,8 @@ userSchema.virtual('tasks', {
     foreignField: 'owner'
 });
 
-//instance methods
+//INSTANCE METHODS
+    //generate tokens
 userSchema.methods.generateAuthToken = async function () {
     const user = this;
     const token = jwt.sign({ _id: user._id.toString() }, 'theSecret');
@@ -68,6 +73,7 @@ userSchema.methods.generateAuthToken = async function () {
     return token;
 };
 
+    //hide private data
 userSchema.methods.toJSON = function () {
     const user = this;
     const userObject = user.toObject();
@@ -80,7 +86,7 @@ userSchema.methods.toJSON = function () {
 
 
 
-//class methods
+//CLASS METHODS
 userSchema.statics.findByCredentials = async (email, password) => {
     const user = await User.findOne({ email });
 
@@ -98,7 +104,8 @@ userSchema.statics.findByCredentials = async (email, password) => {
 };
 
 
-//Delete user tasks when users is removed
+//TRIGGERS
+    //Delete user tasks when users is removed
 userSchema.pre('remove', async function (next) {
     const user = this;
 
@@ -107,7 +114,7 @@ userSchema.pre('remove', async function (next) {
     next();
 });
 
-//hash plain text password before saving or updating
+    //hash plain text password before saving or updating
 userSchema.pre('save', async function (next) {
     const user = this;
 
@@ -118,7 +125,7 @@ userSchema.pre('save', async function (next) {
     next();
 });
 
-const User = mongoose.model('User', userSchema);
 
+const User = mongoose.model('User', userSchema);
 
 module.exports = User;
