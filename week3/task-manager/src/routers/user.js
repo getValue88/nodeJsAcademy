@@ -1,5 +1,6 @@
 const express = require('express');
 const multer = require('multer');
+const sharp = require('sharp');
 const router = new express.Router();
 const User = require('../models/User');
 const auth = require('../middlewares/auth');
@@ -108,12 +109,20 @@ router.delete('/users/me', auth, async (req, res) => {
 
 //upload avatar
 router.post('/users/me/avatar', auth, avatarUpload.single('avatar'), async (req, res) => {
-    req.user.avatar = req.file.buffer;
+    try {
+        req.user.avatar = await sharp(req.file.buffer)
+            .resize({ width: 250, height: 250 })
+            .png()
+            .toBuffer();
 
-    await req.user.save();
-    res.send();
+        await req.user.save();
+        res.send();
 
-    //error handling
+    } catch (error) {
+        res.status(400).send();
+    }
+
+    //multer error handling
 }, (error, req, res, next) => {
     res.status(400).send({ error: error.message });
 });
@@ -139,7 +148,7 @@ router.get('/users/:id/avatar', /* auth ,*/ async (req, res) => {
             throw new Error();
         }
 
-        res.set('Content-type', 'image/jpg');
+        res.set('Content-type', 'image/png');
         res.send(user.avatar);
     } catch (error) {
         res.status(404).send();
