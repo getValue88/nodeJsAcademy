@@ -1,7 +1,22 @@
 const express = require('express');
+const multer = require('multer');
 const router = new express.Router();
 const User = require('../models/User');
 const auth = require('../middlewares/auth');
+
+const avatarUpload = multer({
+    dest: 'avatars',
+    limits: {
+        fileSize: 1000000
+    },
+    fileFilter(req, file, cb) {
+        if (!file.originalname.match(/\.(jpg|jpeg|png|svg)$/)) {
+           return cb(new Error('Allowed extensions: jpg jpeg png svg'));
+        }
+
+        cb(undefined, true);
+    }
+});
 
 //Create User
 router.post('/users', async (req, res) => {
@@ -87,6 +102,11 @@ router.delete('/users/me', auth, async (req, res) => {
     } catch (error) {
         res.status(500).send();
     }
+});
+
+//upload avatar
+router.post('/users/me/avatar', [auth, avatarUpload.single('avatar')], (req, res) => {
+    res.send();
 });
 
 module.exports = router;
