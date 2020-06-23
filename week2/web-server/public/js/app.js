@@ -19,8 +19,6 @@ const weather = address => {
         );
 }
 
-
-
 document.querySelector('form').addEventListener('submit', e => {
     e.preventDefault();
 
@@ -28,3 +26,12 @@ document.querySelector('form').addEventListener('submit', e => {
     weather(location);
 });
 
+document.querySelector('#geolocation-btn').addEventListener('click', () => {
+    if (!navigator.geolocation) {
+        return alert('Your browser doesn\'t support geolocation');
+    }
+
+    navigator.geolocation.getCurrentPosition(({ coords }) => {
+        weather(`${coords.longitude},${coords.latitude}`);
+    });
+});
