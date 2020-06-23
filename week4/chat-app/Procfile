@@ -1,0 +1,1 @@
+web: npm install week4/chat-app && node week4/chat-app/src/index.js
