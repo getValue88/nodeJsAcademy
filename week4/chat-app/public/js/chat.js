@@ -37,8 +37,6 @@ const autoscroll = () => {
     if (containerHeight - newMessageHeight <= scrollOffset) {
         $messages.scrollTop = $messages.scrollHeight;
     }
-
-    console.log(containerHeight,newMessageHeight,scrollOffset);
 };
 
 //IO
@@ -119,4 +117,3 @@ socket.on('roomData', ({ room, users }) => {
 
     $sidebar.innerHTML = html;
 });
-

@@ -22,22 +22,18 @@ const imageUpload = multer({
 
 //Create Task
 router.post('/tasks', auth, imageUpload.single('image'), async (req, res) => {
-    let image;
-
     try {
+        const task = new Task({
+            ...JSON.parse(req.body.task),
+            owner: req.user._id
+        });
+
         if (req.file) {
-            image = await sharp(req.file.buffer)
+            task.image = await sharp(req.file.buffer)
                 .resize({ width: 50, height: 50 })
                 .png()
                 .toBuffer();
         }
-
-        const jsonTask = await JSON.parse(req.body.task);
-        const task = new Task({
-            ...jsonTask,
-            image,
-            owner: req.user._id
-        });
 
         await task.save();
         res.status(201).send(task);

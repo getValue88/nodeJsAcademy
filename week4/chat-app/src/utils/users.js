@@ -45,9 +45,17 @@ const getUsersInRoom = (room) => {
     return users.filter(user => user.room === room);
 }
 
+//returns an array of strings filtering duplicated rooms
+const getRooms = () => {
+    return users.filter((user, i, arr) => arr.findIndex(t => (t.room === user.room)) === i).map(user => {
+        return { room: user.room };
+    });
+}
+
 module.exports = {
     addUser,
     removeUser,
     getUser,
-    getUsersInRoom
+    getUsersInRoom,
+    getRooms
 }
