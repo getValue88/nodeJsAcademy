@@ -1,16 +1,44 @@
 const express = require('express');
 const Task = require('../models/Task');
 const auth = require('../middlewares/auth');
+const multer = require('multer');
+const sharp = require('sharp');
 const router = new express.Router();
 
+//multer config
+const imageUpload = multer({
+    // dest: 'images', // <-- folder to save the files
+    limits: {
+        fileSize: 1000000
+    },
+    fileFilter(req, file, cb) {
+        if (!file.originalname.match(/\.(jpg|jpeg|png|svg)$/)) {
+            return cb(new Error('Allowed extensions: jpg jpeg png svg'));
+        }
+
+        cb(undefined, true);
+    }
+});
+
 //Create Task
-router.post('/tasks', auth, async (req, res) => {
-    const task = new Task({
-        ...req.body,
-        owner: req.user._id
-    });
+router.post('/tasks', auth, imageUpload.single('image'), async (req, res) => {
+    let image;
 
     try {
+        if (req.file) {
+            image = await sharp(req.file.buffer)
+                .resize({ width: 50, height: 50 })
+                .png()
+                .toBuffer();
+        }
+
+        const jsonTask = await JSON.parse(req.body.task);
+        const task = new Task({
+            ...jsonTask,
+            image,
+            owner: req.user._id
+        });
+
         await task.save();
         res.status(201).send(task);
 
@@ -120,6 +148,21 @@ router.delete('/tasks/:id', auth, async (req, res) => {
 
     } catch (error) {
         res.status(500).send();
+    }
+});
+
+router.get('/task/:id/image', async (req, res) => {
+    try {
+        const task = await Task.findById(req.params.id);
+
+        if (!task || !task.image) {
+            throw new Error();
+        }
+
+        res.set('Content-type', 'image/png');
+        res.send(task.image);
+    } catch (error) {
+        res.status(404).send();
     }
 });
 
