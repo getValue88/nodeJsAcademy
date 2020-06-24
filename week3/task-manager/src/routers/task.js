@@ -106,8 +106,10 @@ router.get('/tasks/:id', auth, async (req, res) => {
 });
 
 //update task
-router.patch('/tasks/:id', auth, async (req, res) => {
-    const updates = Object.keys(req.body);
+router.patch('/tasks/:id', auth, imageUpload.single('image'), async (req, res) => {
+    const fieldsToUpdate = JSON.parse(req.body.task);
+    const updates = Object.keys(fieldsToUpdate);
+
     const allowedUpdates = ['description', 'completed'];
     const isValidOperation = updates.every(update => allowedUpdates.includes(update));
 
@@ -122,7 +124,15 @@ router.patch('/tasks/:id', auth, async (req, res) => {
             return res.status(404).send();
         }
 
-        updates.forEach(update => task[update] = req.body[update]);
+        if (req.file) {
+            task.image = await sharp(req.file.buffer)
+                .resize({ width: 50, height: 50 })
+                .png()
+                .toBuffer();
+        }
+
+        updates.forEach(update => task[update] = fieldsToUpdate[update]);
+
         await task.save();
         res.send(task);
 
@@ -161,5 +171,23 @@ router.get('/task/:id/image', async (req, res) => {
         res.status(404).send();
     }
 });
+
+router.delete('/tasks/:id/image', auth, async (req, res) => {
+    try {
+        const task = await Task.findById(req.params.id);
+
+        if (!task || !task.image) {
+            return res.status(404).send();
+        }
+
+        task.image = undefined;
+
+        await task.save();
+        res.send();
+
+    } catch (e) {
+        res.status(500).send()
+    }
+})
 
 module.exports = router;
