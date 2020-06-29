@@ -5,7 +5,7 @@ const userRouter = require('./routers/user');
 const taskRouter = require('./routers/task');
 const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
-const swaggerDocument = YAML.load(path.join(__dirname, './swagger.yaml'));
+const swaggerDocument = YAML.load(path.join(__dirname, '../swagger.yaml'));
 
 //CONFIG
 const app = express();
