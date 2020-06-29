@@ -1,10 +1,11 @@
 const express = require('express');
+const path = require('path');
 require('./db/mongoose');
 const userRouter = require('./routers/user');
 const taskRouter = require('./routers/task');
 const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
-const swaggerDocument = YAML.load('./swagger.yaml');
+const swaggerDocument = YAML.load(path(__dirname, './swagger.yaml'));
 
 //CONFIG
 const app = express();
