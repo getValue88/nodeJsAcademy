@@ -4,9 +4,7 @@ info:
   description: This API manages users and their respective tasks
   version: 1.0.0
 servers:
-  - url: http://localhost:3000
-    description: Dev server
-  - url: http://task-manager-nodejs-academy.herokuapp.com
+  - url: https://task-manager-nodejs-academy.herokuapp.com
     description: Prod server
 paths:
   /users:
