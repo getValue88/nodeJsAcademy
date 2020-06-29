@@ -23,13 +23,13 @@ const avatarUpload = multer({
 
 
 //Create User
-router.post('/users', async (req, res) => {
+router.post('/', async (req, res) => {
     const user = new User(req.body);
 
     try {
         // await user.save();
         const token = await user.generateAuthToken(); // this method also saves the user
-        sendWelcomeEmail(user.email, user.name);
+        // sendWelcomeEmail(user.email, user.name);
 
         res.status(201).send({ user, token });
 
@@ -39,7 +39,7 @@ router.post('/users', async (req, res) => {
 });
 
 //User Login
-router.post('/users/login', async (req, res) => {
+router.post('/login', async (req, res) => {
     try {
         const user = await User.findByCredentials(req.body.email, req.body.password);
         const token = await user.generateAuthToken();
@@ -51,7 +51,7 @@ router.post('/users/login', async (req, res) => {
 });
 
 //User Logout
-router.post('/users/logout', auth, async (req, res) => {
+router.post('/logout', auth, async (req, res) => {
     try {
         req.user.tokens = req.user.tokens.filter(token => token.token !== req.token);
         await req.user.save();
@@ -63,7 +63,7 @@ router.post('/users/logout', auth, async (req, res) => {
 });
 
 //User logoutAll
-router.post('/users/logoutAll', auth, async (req, res) => {
+router.post('/logoutAll', auth, async (req, res) => {
     try {
         req.user.tokens = [];
         await req.user.save();
@@ -75,12 +75,12 @@ router.post('/users/logoutAll', auth, async (req, res) => {
 });
 
 //Get user
-router.get('/users/me', auth, async (req, res) => {
+router.get('/me', auth, async (req, res) => {
     res.send(req.user);
 });
 
 //update user
-router.patch('/users/me', auth, async (req, res) => {
+router.patch('/me', auth, async (req, res) => {
     const updates = Object.keys(req.body);
     const allowedUpdates = ['name', 'email', 'password', 'age'];
     const isValidOperation = updates.every(update => allowedUpdates.includes(update));
@@ -100,7 +100,7 @@ router.patch('/users/me', auth, async (req, res) => {
 });
 
 //delete user
-router.delete('/users/me', auth, async (req, res) => {
+router.delete('/me', auth, async (req, res) => {
     try {
         await req.user.remove();
         sendCancelationEmail(req.user.email, req.user.name);
@@ -113,7 +113,7 @@ router.delete('/users/me', auth, async (req, res) => {
 });
 
 //upload avatar
-router.post('/users/me/avatar', auth, avatarUpload.single('avatar'), async (req, res) => {
+router.post('/me/avatar', auth, avatarUpload.single('avatar'), async (req, res) => {
     try {
         req.user.avatar = await sharp(req.file.buffer)
             .resize({ width: 250, height: 250 })
@@ -133,7 +133,7 @@ router.post('/users/me/avatar', auth, avatarUpload.single('avatar'), async (req,
 });
 
 //delete avatar
-router.delete('/users/me/avatar', auth, async (req, res) => {
+router.delete('/me/avatar', auth, async (req, res) => {
     try {
         req.user.avatar = undefined;
         await req.user.save();
@@ -145,7 +145,7 @@ router.delete('/users/me/avatar', auth, async (req, res) => {
 });
 
 //get avatar by user id
-router.get('/users/:id/avatar', async (req, res) => {
+router.get('/:id/avatar', async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
 

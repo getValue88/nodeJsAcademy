@@ -1,0 +1,97 @@
+openapi: 3.0.0
+info:
+  title: Task-Manager API
+  description: This API manages users and their respective tasks
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+    description: Dev server
+  - url: https://task-manager-nodejs-academy.herokuapp.com
+    description: Prod server
+paths:
+  /users:
+    post:
+      tags:
+        - Users
+      name: Signup
+      summary: Creates a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                password:
+                  type: string
+                  format: password
+                email:
+                  type: string
+                  format: email
+              required:
+                - username
+                - password
+                - email
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    example: "5efa1ba723e21431e0e10e91"
+                  name:
+                    type: string
+                    example: Jessica Smith
+                  email:
+                    type: string
+                    format: email
+                    example: example1@gmail.com
+                  age:
+                    type: number
+                    example: 20
+                  createdAt:
+
+        "400":
+          description: Email already in use / invalid password or email.
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          readOnly: true
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+          writeOnly: true
+        age:
+          type: number
+        avatar:
+          type: string
+          format: binary
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+        token:
+          type: string
+      required:
+        - name
+        - email
+        - password

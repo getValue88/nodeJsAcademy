@@ -48,7 +48,7 @@ router.post('/tasks', auth, imageUpload.single('image'), async (req, res) => {
 //      ?completed=true --> filter by completed field
 //      ?page=2&limit=5 --> pagination
 //      ?sortBy=createdAt:desc --> sort by createdAt timestamp
-router.get('/tasks', auth, async (req, res) => {
+router.get('/', auth, async (req, res) => {
     const match = {};
     const sort = {};
     let skip = 0;
@@ -88,7 +88,7 @@ router.get('/tasks', auth, async (req, res) => {
 });
 
 //get task by id
-router.get('/tasks/:id', auth, async (req, res) => {
+router.get('/:id', auth, async (req, res) => {
     const _id = req.params.id;
 
     try {
@@ -106,7 +106,7 @@ router.get('/tasks/:id', auth, async (req, res) => {
 });
 
 //update task
-router.patch('/tasks/:id', auth, imageUpload.single('image'), async (req, res) => {
+router.patch('/:id', auth, imageUpload.single('image'), async (req, res) => {
     const fieldsToUpdate = JSON.parse(req.body.task);
     const updates = Object.keys(fieldsToUpdate);
 
@@ -142,7 +142,7 @@ router.patch('/tasks/:id', auth, imageUpload.single('image'), async (req, res) =
 });
 
 //delete task
-router.delete('/tasks/:id', auth, async (req, res) => {
+router.delete('/:id', auth, async (req, res) => {
     try {
         const task = await Task.findOneAndDelete({ _id: req.params.id, owner: req.user._id });
 
@@ -157,7 +157,7 @@ router.delete('/tasks/:id', auth, async (req, res) => {
     }
 });
 
-router.get('/task/:id/image', async (req, res) => {
+router.get('/:id/image', async (req, res) => {
     try {
         const task = await Task.findById(req.params.id);
 
@@ -172,7 +172,7 @@ router.get('/task/:id/image', async (req, res) => {
     }
 });
 
-router.delete('/tasks/:id/image', auth, async (req, res) => {
+router.delete('/:id/image', auth, async (req, res) => {
     try {
         const task = await Task.findById(req.params.id);
 
