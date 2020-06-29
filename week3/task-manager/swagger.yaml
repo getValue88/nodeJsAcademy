@@ -6,7 +6,7 @@ info:
 servers:
   - url: http://localhost:3000
     description: Dev server
-  - url: task-manager-nodejs-academy.herokuapp.com
+  - url: http://task-manager-nodejs-academy.herokuapp.com
     description: Prod server
 paths:
   /users:
