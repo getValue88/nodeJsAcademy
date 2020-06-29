@@ -6,14 +6,13 @@ info:
 servers:
   - url: http://localhost:3000
     description: Dev server
-  - url: https://task-manager-nodejs-academy.herokuapp.com
+  - url: http://task-manager-nodejs-academy.herokuapp.com
     description: Prod server
 paths:
   /users:
     post:
       tags:
         - Users
-      name: Signup
       summary: Creates a user
       requestBody:
         required: true
@@ -30,6 +29,8 @@ paths:
                 email:
                   type: string
                   format: email
+                age:
+                  type: number
               required:
                 - username
                 - password
@@ -40,27 +41,89 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  _id:
-                    type: string
-                    example: "5efa1ba723e21431e0e10e91"
-                  name:
-                    type: string
-                    example: Jessica Smith
-                  email:
-                    type: string
-                    format: email
-                    example: example1@gmail.com
-                  age:
-                    type: number
-                    example: 20
-                  createdAt:
-
+                $ref: '#/components/schemas/UserResponse'          
         "400":
           description: Email already in use / invalid password or email.
+
+  /users/login:
+    post:
+      tags:
+        - Users
+      summary: Logs in an existent user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+              required:
+                - password
+                - email
+      responses:
+        "200":
+          description: User logged in
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        "400":
+          description: Bad username or password
+
+  /users/logout:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - Users
+      summary: Logs out a user
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+            format: JWT
+          required: true
+      responses:
+        "200":
+          description: User logged out
+        "401":
+          description: Unauthorized
+
 components:
-  schemas:
+  securitySchemes:
+      bearerAuth:       
+        type: http
+        scheme: bearer
+        bearerFormat: JWT   
+  schemas:  
+    UserResponse:
+      type: object
+      properties:
+        user:
+          type: object
+          properties:
+            _id:
+              type: string
+              example: "5efa1ba723e21431e0e10e91"
+            name:
+              type: string
+              example: Jessica Smith
+            email:
+              type: string
+              format: email
+              example: example1@gmail.com
+            age:
+              type: number
+              example: 20
+        token:
+          type: string
     User:
       type: object
       properties:
