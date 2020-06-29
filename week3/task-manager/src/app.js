@@ -11,7 +11,7 @@ const app = express();
 app.use(express.json());
 
 //MIDDLEWARES
-/* app.use((req, res, next) => {
+/*app.use((req, res, next) => {
     res.status(503).send('Server is under maintenance');
 }); */
 
