@@ -643,6 +643,7 @@ components:
               example: 20
         token:
           type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZWZiNWE4M2Y3NmU2NzMyNDA5ZTM5OGUiLCJpYXQiOjE1OTM1MzgzNzR9.pkcOnTpx191p_mbLiKAAs3cpH4_nWtKjUFnoE5gOqyM
 
     Task:
       type: object
