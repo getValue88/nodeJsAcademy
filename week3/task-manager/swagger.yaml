@@ -1,14 +1,16 @@
+---
 openapi: 3.0.0
 info:
   title: Task-Manager API
   description: This API manages users and their respective tasks
   version: 1.0.0
 servers:
-  - url: http://localhost:3000
+  - url: "http://localhost:3000"
     description: Dev server
-  - url: https://task-manager-nodejs-academy.herokuapp.com
+  - url: "https://task-manager-nodejs-academy.herokuapp.com"
     description: Prod server
 paths:
+  #USER ENDPOINTS
   /users:
     post:
       tags:
@@ -41,7 +43,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserResponse'          
+                $ref: "#/components/schemas/UserResponse"
         "400":
           description: Email already in use / invalid password or email.
 
@@ -72,7 +74,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserResponse'
+                $ref: "#/components/schemas/UserResponse"
         "400":
           description: Bad username or password
 
@@ -96,14 +98,531 @@ paths:
         "401":
           description: Unauthorized
 
+  /users/logoutAll:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - Users
+      summary: Remove all tokens from a user
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+            format: JWT
+          required: true
+      responses:
+        "200":
+          description: Tokens removed
+        "401":
+          description: Unauthorized
+
+  /users/me:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Users
+      summary: Gets current user data
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+            format: JWT
+          required: true
+      responses:
+        "200":
+          description: User data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    example: 5efa1ba723e21431e0e10e91
+                  name:
+                    type: string
+                    example: Jessica Smith
+                  email:
+                    type: string
+                    format: email
+                    example: example1@gmail.com
+                  age:
+                    type: number
+                    example: 20
+        "401":
+          description: Unauthorized
+
+    patch:
+      security:
+        - bearerAuth: []
+      tags:
+        - Users
+      summary: Updates current user data
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+            format: JWT
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                password:
+                  type: string
+                  format: password
+                email:
+                  type: string
+                  format: email
+                age:
+                  type: number
+      responses:
+        "200":
+          description: Updated user data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    example: 5efa1ba723e21431e0e10e91
+                  name:
+                    type: string
+                    example: Jessica Smith
+                  email:
+                    type: string
+                    format: email
+                    example: example1@gmail.com
+                  age:
+                    type: number
+                    example: 20
+        "400":
+          description: Invalidad Updates
+        "401":
+          description: Unauthorized
+
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+        - Users
+      summary: Deletes current user
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+            format: JWT
+          required: true
+      responses:
+        "200":
+          description: User removed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    example: 5efa1ba723e21431e0e10e91
+                  name:
+                    type: string
+                    example: Jessica Smith
+                  email:
+                    type: string
+                    format: email
+                    example: example1@gmail.com
+                  age:
+                    type: number
+                    example: 20
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal error
+
+  /users/me/avatar:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - Users
+      summary: Upload profile image for current user
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+            format: JWT
+          required: true
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                avatar:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: Task created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"      
+        "400":
+          description: Invalid file
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal error
+
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+        - Users
+      summary: Deletes profile image for current user
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+            format: JWT
+          required: true
+      responses:
+        "200":
+          description: Image removed
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal error
+
+  /users/{userId}/avatar:
+    get:
+      tags:
+        - Users
+      summary: Returns profile image for a user by user by ID.
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: User Id
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Profile image in png
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+        "404":
+          description: Image not found
+        "500":
+          description: Internal error
+
+  #TASK ENDPOINTS
+  /tasks:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - Tasks
+      summary: Create a task for current user
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+            format: JWT
+          required: true
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+                task:
+                  type: object
+                  properties:
+                    description:
+                      type: string
+                      example: Do something
+                    completed:
+                      type: boolean
+                      example: false
+                  required:
+                    - description
+      responses:
+        "201":
+          description: Task Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    example: 5efb61a8c29fe331d4becc11
+                  description:
+                    type: string
+                    example: Do something
+                  completed:
+                    type: boolean
+                    example: false
+                  owner:
+                    type: string
+                    example: 5efb5a83f76e6732409e398e
+                  image:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        example: Buffer
+                      data:
+                        type: string
+                        format: binary
+                  createdAt:
+                    type: string
+                    format: date-time
+                    example: '2020-06-30T16:00:40.371Z'
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    example: '2020-06-30T16:00:40.371Z'
+        "400":
+          description: Invalid Task/file
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal error
+
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Tasks
+      summary: Get Tasks for current user
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+            format: JWT
+          required: true
+        - in: query
+          name: completed
+          schema:
+            type: boolean
+            example: true
+        - in: query
+          name: page
+          schema:
+            type: number
+            example: 2
+        - in: query
+          name: limit
+          schema:
+            type: number
+            example: 2
+        - in: query
+          name: sortBy
+          schema:
+            type: string
+            example: 'createdAt:desc'
+      responses:
+        "200":
+          description: Tasks for current user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Task"
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal error
+
+  /tasks/{id}:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - Tasks
+      summary: Get a single task from current user by task id
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+            format: JWT
+          required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"      
+        "401":
+          description: Unauthorized
+        "404":
+          description: Task not found
+        "500":
+          description: Internal error
+
+    patch:
+      security:
+        - bearerAuth: []
+      tags:
+        - Tasks
+      summary: Updates a task from the current user by task id
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+            format: JWT
+          required: true
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+                task:
+                  type: object
+                  properties:
+                    description:
+                      type: string
+                      example: Do something
+                    completed:
+                      type: boolean
+                      example: false
+                  required:
+                    - description
+      responses:
+        "200":
+          description: Task Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"      
+        "400":
+          description: Invalid file or fields
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal error
+
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+        - Tasks
+      summary: Deletes a task from current user by task id
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+            format: JWT
+          required: true
+      responses:
+        "200":
+          description: Task removed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Task not found
+        "500":
+          description: Internal error 
+
+  /tasks/{id}/image:
+    get:
+      tags:
+        - Tasks
+      summary: Get image task by task id
+      parameters:
+        - in: path
+          name: id  
+          required: true
+          schema:
+            type: string
+            required: true
+      responses:
+        '200':
+          description: task image in PNG
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Task or image not found
+        '500':
+          description: Internal error
+
+    delete:
+      security:
+        - bearerAuth: []
+      tags:
+        - Tasks
+      summary: Delete image from a task of the current user by task id
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+            format: JWT
+          required: true
+        - in: path
+          name: id  
+          required: true
+          schema:
+            type: string
+            required: true
+      responses:
+        '200':
+          description: Image deleted
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal error
+
 components:
   securitySchemes:
-      bearerAuth:       
-        type: http
-        scheme: bearer
-        bearerFormat: JWT   
-  schemas:  
-    UserResponse:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
       type: object
       properties:
         user:
@@ -111,7 +630,7 @@ components:
           properties:
             _id:
               type: string
-              example: "5efa1ba723e21431e0e10e91"
+              example: 5efa1ba723e21431e0e10e91
             name:
               type: string
               example: Jessica Smith
@@ -124,37 +643,36 @@ components:
               example: 20
         token:
           type: string
-    User:
+
+    Task:
       type: object
       properties:
         _id:
           type: string
-          readOnly: true
-        name:
+          example: '5efb61a8c29fe331d4becc11'
+        description:
           type: string
-        email:
+          example: Do something
+        completed:
+          type: boolean
+          example: false
+        owner:
           type: string
-          format: email
-        password:
-          type: string
-          format: password
-          writeOnly: true
-        age:
-          type: number
-        avatar:
-          type: string
-          format: binary
+          example: '5efb5a83f76e6732409e398e'
+        image:
+          type: object
+          properties:
+            type:
+              type: string
+              example: Buffer
+            data:
+              type: string
+              format: binary
         createdAt:
           type: string
           format: date-time
-          readOnly: true
-        updatedAt:
+          example: "2020-06-30T16:00:40.371Z"
+        updatedAt: 
           type: string
           format: date-time
-          readOnly: true
-        token:
-          type: string
-      required:
-        - name
-        - email
-        - password
+          example: "2020-06-30T16:00:40.371Z" 

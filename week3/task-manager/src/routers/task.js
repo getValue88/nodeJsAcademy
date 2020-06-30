@@ -21,7 +21,7 @@ const imageUpload = multer({
 });
 
 //Create Task
-router.post('/tasks', auth, imageUpload.single('image'), async (req, res) => {
+router.post('/', auth, imageUpload.single('image'), async (req, res) => {
     try {
         const task = new Task({
             ...JSON.parse(req.body.task),
