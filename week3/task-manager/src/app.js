@@ -23,7 +23,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 
 app.get('', (req, res) => {
-    res.send('Welcome to the Task Manager API');
+    res.send('Welcome to the Task Manager API<br><a href="/api-docs">Documentation</a>');
 });
 
 
