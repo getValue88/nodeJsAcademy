@@ -57,6 +57,7 @@ $messageForm.addEventListener('submit', e => {
 
     $messageFormButton.setAttribute('disabled', 'disabled');
 
+    //send private message
     if (private) {
         return socket.emit('privateMessage', {
             to,
@@ -77,6 +78,7 @@ $messageForm.addEventListener('submit', e => {
         });
     }
 
+    //send public message
     socket.emit('sendMessage', $messageFormInput.value, (err) => {
         $messageFormButton.removeAttribute('disabled');
         $messageFormInput.value = '';
@@ -123,8 +125,8 @@ socket.on('message', msg => {
 
 socket.on('privateMessage', msg => {
     const html = Mustache.render(messageTemplate, {
-        class : 'privateMsg',
-        username:`From: ${msg.username}` ,
+        class: 'privateMsg',
+        username: msg.username,
         msg: msg.text,
         createdAt: moment(msg.createdAt).format('HH:mm')
     });
@@ -145,6 +147,7 @@ socket.on('locationMessage', payload => {
 });
 
 socket.on('roomData', ({ room, users }) => {
+    //render user list
     const html = Mustache.render(sidebarTemplate, {
         room,
         users
@@ -152,9 +155,18 @@ socket.on('roomData', ({ room, users }) => {
 
     $sidebar.innerHTML = html;
 
+    //click event to each user on list
     const $usersLiArray = $sidebar.querySelectorAll('ul li');
     $usersLiArray.forEach(li => {
         li.addEventListener('click', () => {
+            //unselect user
+            if (li.style.fontWeight == 'bold') {
+                li.style.fontWeight = 'normal';
+                to = '';
+                return private = false;
+            }
+
+            //select user
             $usersLiArray.forEach(el => el.style.fontWeight = 'normal');
             li.style.fontWeight = 'bold';
             private = true;

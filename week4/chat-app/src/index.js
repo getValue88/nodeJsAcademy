@@ -18,7 +18,7 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 //IO
 io.on('connection', socket => {
-
+    //join a room
     socket.on('join', ({ username, room }, callback) => {
         const { error, user } = addUser({ id: socket.id, username, room });
 
@@ -39,6 +39,7 @@ io.on('connection', socket => {
         callback();
     });
 
+    //public message
     socket.on('sendMessage', (msg, callback) => {
         const user = getUser(socket.id);
         const filter = new Filter();
@@ -51,18 +52,29 @@ io.on('connection', socket => {
         callback();
     });
 
-    socket.on('privateMessage', ({to,message}, callback) => {
+    //private message
+    socket.on('privateMessage', ({ to, message }, callback) => {
         const user = getUser(socket.id);
+        const receptor = getUser(to);
         const filter = new Filter();
 
         if (filter.isProfane(message)) {
             return callback('Profanity is not allowed');
         }
 
-        io.to(to).emit('privateMessage', generateMessage(user.username, message));
+        //disable self private message
+        if (user.id === receptor.id) {
+            io.to(user.id).emit('message', generateMessage('Admin', 'Self private messages are disabled!'));
+            return callback();
+        }
+
+        //send message to emisor and receptor
+        io.to(to).emit('privateMessage', generateMessage('From: ' + user.username, message));
+        io.to(socket.id).emit('privateMessage', generateMessage('To: ' + receptor.username, message));
         callback();
     });
 
+    //location message
     socket.on('sendLocation', ({ latitude, longitude }, callback) => {
         const user = getUser(socket.id);
 
@@ -70,10 +82,12 @@ io.on('connection', socket => {
         callback();
     });
 
+    //active rooms
     socket.on('getRooms', () => {
         socket.emit('sendRooms', getRooms());
     });
 
+    //socket disconnect
     socket.on('disconnect', () => {
         const user = removeUser(socket.id);
 
