@@ -51,6 +51,18 @@ io.on('connection', socket => {
         callback();
     });
 
+    socket.on('privateMessage', ({to,message}, callback) => {
+        const user = getUser(socket.id);
+        const filter = new Filter();
+
+        if (filter.isProfane(message)) {
+            return callback('Profanity is not allowed');
+        }
+
+        io.to(to).emit('privateMessage', generateMessage(user.username, message));
+        callback();
+    });
+
     socket.on('sendLocation', ({ latitude, longitude }, callback) => {
         const user = getUser(socket.id);
 

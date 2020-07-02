@@ -16,6 +16,9 @@ const sidebarTemplate = document.querySelector('#sidebar-template').innerHTML;
 //OPTIONS
 const { username, room } = Qs.parse(location.search, { ignoreQueryPrefix: true });
 
+let private = false;
+let to = '';
+
 //FUNCTIONS
 const autoscroll = () => {
     // new message element
@@ -53,6 +56,26 @@ $messageForm.addEventListener('submit', e => {
     e.preventDefault();
 
     $messageFormButton.setAttribute('disabled', 'disabled');
+
+    if (private) {
+        return socket.emit('privateMessage', {
+            to,
+            message: $messageFormInput.value
+
+        }, (err) => {
+            $messageFormButton.removeAttribute('disabled');
+            $messageFormInput.value = '';
+            $messageFormInput.focus();
+
+            if (err) {
+                return console.log(err);
+            }
+            console.log('message delivered');
+            document.querySelector(`[data-userid="${to}"]`).style.fontWeight = 'normal';
+            private = false;
+            to = '';
+        });
+    }
 
     socket.emit('sendMessage', $messageFormInput.value, (err) => {
         $messageFormButton.removeAttribute('disabled');
@@ -98,6 +121,18 @@ socket.on('message', msg => {
     autoscroll();
 });
 
+socket.on('privateMessage', msg => {
+    const html = Mustache.render(messageTemplate, {
+        class : 'privateMsg',
+        username:`From: ${msg.username}` ,
+        msg: msg.text,
+        createdAt: moment(msg.createdAt).format('HH:mm')
+    });
+
+    $messages.insertAdjacentHTML('beforeend', html);
+    autoscroll();
+});
+
 socket.on('locationMessage', payload => {
     const html = Mustache.render(locationTemplate, {
         username: payload.username,
@@ -116,4 +151,14 @@ socket.on('roomData', ({ room, users }) => {
     });
 
     $sidebar.innerHTML = html;
+
+    const $usersLiArray = $sidebar.querySelectorAll('ul li');
+    $usersLiArray.forEach(li => {
+        li.addEventListener('click', () => {
+            $usersLiArray.forEach(el => el.style.fontWeight = 'normal');
+            li.style.fontWeight = 'bold';
+            private = true;
+            to = li.dataset.userid;
+        });
+    })
 });
